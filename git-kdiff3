@@ -17,7 +17,6 @@ function diff_working_copy () {
 	xargs --arg-file=$list -0 git archive --prefix=a/ "$1" | tar xf - -C $O || exit 1
 	git diff --name-only --diff-filter=CAMRTUB -z "$1" > $list || exit 1
 	cat $list | while read -r -d '' fname; do
-		echo "$fname"
 		if [ -e "$fname" ]; then
 			dir=`dirname "$fname"`
 			dest="$O/b/$dir"
