@@ -1,0 +1,56 @@
+#!/bin/sh -e
+
+# Usage: git kdiff3 [commit1 [commit2]]
+# Copy this script to: /usr/libexec/git-core/
+
+SUBDIRECTORY_OK=1
+. "`git --exec-path`/git-sh-setup" || exit 1
+cd_to_toplevel
+
+O=".git-kdiff3-tmp-$$"
+list=$O/.git-kdiff3-list
+trap "rm -rf $O" 0
+mkdir $O || exit 1
+
+function diff_working_copy () {
+	git diff --name-only --diff-filter=CDMRTUB -z "$1" > $list || exit 1
+	xargs --arg-file=$list -0 git archive --prefix=a/ "$1" | tar xf - -C $O || exit 1
+	git diff --name-only --diff-filter=CAMRTUB -z "$1" > $list || exit 1
+	cat $list | while read -r -d '' fname; do
+		echo "$fname"
+		if [ -e "$fname" ]; then
+			dir=`dirname "$fname"`
+			dest="$O/b/$dir"
+			mkdir -p "$dest" || exit 1
+			cp "$fname" "$dest" || exit 1
+		fi
+	done
+}
+
+case $# in
+	2)
+	git diff --name-only --diff-filter=CDMRTUB -z "$1" "$2" > $list || exit 1
+	xargs --arg-file=$list -0 git archive --prefix=a/ "$1" | tar xf - -C $O || exit 1
+	git diff --name-only --diff-filter=CAMRTUB -z "$1" "$2" > $list || exit 1
+	xargs --arg-file=$list -0 git archive --prefix=b/ "$2" | tar xf - -C $O || exit 1
+	;;
+
+	1)
+	diff_working_copy "$1"
+	;;
+
+	0)
+	branch=`git branch --no-color|grep '^*'|sed 's/[\* ]//g'`
+	diff_working_copy "$branch"
+	;;
+
+	*)
+	echo >&2 "error: illegal number of arguments"
+	exit 1
+	;;
+esac
+
+if [ -e $O/a -a -e $O/b ]; then
+	kdiff3 $O/a $O/b
+	exit $?
+fi
