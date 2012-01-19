@@ -4,9 +4,10 @@ Use [kdiff3](http://kdiff3.sourceforge.net/) as your diff viewer in [git](http:/
 
 ## Install
 
-Copy `git-kdiff3` somewhere into your `$PATH` or your system git script directory:
+Copy `git-kdiff3` somewhere into your `$PATH` or your git exec path
+(usually /usr/libexec/git-core/):
 
-	sudo cp git-kdiff3 /usr/libexec/git-core/
+	sudo cp git-kdiff3 "`git --exec-path`"
 
 ## Usage
 
