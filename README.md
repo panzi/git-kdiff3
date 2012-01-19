@@ -1,6 +1,6 @@
 # git kdiff3
 
-Use (kdiff3)[http://kdiff3.sourceforge.net/] as your diff viewer in (git)[http://git-scm.com/].
+Use [kdiff3](http://kdiff3.sourceforge.net/) as your diff viewer in [git](http://git-scm.com/).
 
 ## Install
 
