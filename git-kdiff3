@@ -14,7 +14,7 @@ mkdir $O || exit 1
 
 function diff_working_copy () {
 	git diff --name-only --diff-filter=CDMRTUB -z "$1" > $list || exit 1
-	xargs --arg-file=$list -0 git archive --prefix=a/ "$1" | tar xf - -C $O || exit 1
+	xargs -0 git archive --prefix=a/ "$1" < $list | tar xf - -C $O || exit 1
 	git diff --name-only --diff-filter=CAMRTUB -z "$1" > $list || exit 1
 	cat $list | while read -r -d '' fname; do
 		if [ -f "$fname" ]; then
@@ -30,9 +30,9 @@ function diff_working_copy () {
 case $# in
 	2)
 	git diff --name-only --diff-filter=CDMRTUB -z "$1" "$2" > $list || exit 1
-	xargs --arg-file=$list -0 git archive --prefix=a/ "$1" | tar xf - -C $O || exit 1
+	xargs -0 git archive --prefix=a/ "$1" < $list | tar xf - -C $O || exit 1
 	git diff --name-only --diff-filter=CAMRTUB -z "$1" "$2" > $list || exit 1
-	xargs --arg-file=$list -0 git archive --prefix=b/ "$2" | tar xf - -C $O || exit 1
+	xargs -0 git archive --prefix=b/ "$2" < $list | tar xf - -C $O || exit 1
 	;;
 
 	1)
